@@ -1,5 +1,6 @@
 /**
  * classe qui va servir à valider le fichier soumis via le formulaire
+ * et a envoyer les indication visuelles (fichier valide, conversion en .csv réussie...)
  * la classe écoute l'input file
  * si une validation ne passe pas, on affiche une erreur,
  * on peut éventuellement y ajouter d'autres validation côté front
@@ -7,7 +8,7 @@
  */
 class FileValidation {
 
-  constructor(fileSubmit) {
+  constructor() {
     this.inputElement = document.getElementById('file-input');
     this.convertButton = document.getElementById('convert-button');
     this.errorElement = document.getElementById('error');
@@ -17,7 +18,7 @@ class FileValidation {
       this.validate(e);
     })
 
-    this.mainElement = document.getElementById('main');
+    this.downloadButton = document.getElementById('dl-button');
   }
 
   // ajouter des conditions de validations ici
@@ -25,11 +26,16 @@ class FileValidation {
     e.preventDefault();
     const file = e.target.files[0];
 
+    // on supprime les indications si l'utilisateur soumet un nouveau fichier
+    this.downloadButton.classList.remove('show-download-button');
+    this.successElement.classList.remove('show-success');
+
     if (file.type !== 'application/json') {
       this.errorElement.classList.add('show-error');
       this.errorElement.innerText = "Le fichier n'est pas un .json";
       this.convertButton.setAttribute('disabled', "disabled");
-    } else {
+    }
+    if (file.type === 'application/json') {
       this.errorElement.classList.remove('show-error');
       this.convertButton.removeAttribute('disabled');
       this.convertButton.addEventListener('click', (e) => {
@@ -38,8 +44,13 @@ class FileValidation {
     }
   }
 
+  /**
+   * Méthode pour envoyer le fichier soumis
+   * et qui attend la réponse du serveur 
+   */
   handleClick(e, file) {
     e.preventDefault();
+    this.inputElement.value = null;
 
     const sendFile = async () => {
       const fd = new FormData();
@@ -47,22 +58,19 @@ class FileValidation {
       const response = await fetch("/submit_file", {
         method: "POST",
         body: fd
-      })
+      });
       const data = await response.json();
 
       if (response.status === 200) {
-
         this.successElement.classList.add('show-success');
         this.successElement.innerText = "Fichier .csv créé avec succès";
+        this.downloadButton.classList.add('show-download-button');
+        this.downloadButton.setAttribute('href', "ms-excel:ofe|u|file:" + data.link);
+        this.downloadButton.innerText = "Ouvrir le fichier .csv";
 
-        const downloadButton = document.createElement('a');
-        downloadButton.innerText = "Ouvrir le .csv";
-        downloadButton.href = "ms-excel:ofe|u|file:" + data.link;
-        downloadButton.classList.add('download_button');
-        this.mainElement.append(downloadButton);
-
-        downloadButton.addEventListener('click', () => {
-          downloadButton.remove();
+        this.downloadButton.addEventListener('click', () => {
+          this.downloadButton.classList.remove('show-download-button');
+          this.successElement.classList.remove('show-success');
         })
       }
     }

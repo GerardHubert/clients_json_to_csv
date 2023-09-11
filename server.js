@@ -19,26 +19,27 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 })
 
-// c'est ici qu'on reçoit le fichier
+// c'est ici qu'on reçoit le fichier soumis par l'utilisateur
 app.post('/submit_file', upload.single('file'), (req, res) => {
   let file = req.file.path;
 
-  /**
-   * on définit le répertoir d'enregistrement du .csv ici
-   */
+  // on définit le répertoire d'enregistrement du .csv ici
   let fileSortie = path.join(__dirname, 'data', 'csv', 'sortie.csv');
 
-  // on supprime l'ancien .csv s'il existe déjà
+  // on supprime l'ancien .csv s'il en existe un
   if (fs.existsSync(fileSortie)) {
     remove.removeFile(fs, fileSortie);
   }
 
+  /**
+   * on peut lire le fichier .json
+   * et construire le .csv
+   */
   fs.readFile(file, 'utf8', (e, fileData) => {
     if (e) {
-      res.json({ 'error': e })
+      res.json({ 'error': e }).end();
     }
     let fileJSON = JSON.parse(fileData);
-    let tailleJSON = fileJSON.length + 1;
 
     // récupération des utilisateurs actifs
     const filteredJSON = filter.getActiveUsers(fileJSON);
@@ -47,13 +48,12 @@ app.post('/submit_file', upload.single('file'), (req, res) => {
     populate.setHeader(fs, filteredJSON, fileSortie);
     populate.setBody(fs, filteredJSON, fileSortie);
 
-    // enfin, on supprime le fichier uploadé
-    remove.removeFile(fs, file)
 
-    res.status(200).json({ 'link': fileSortie });
   });
+  res.json({ 'link': fileSortie }).end();
+
+  // enfin, on supprime le fichier uploadé
+  remove.removeFile(fs, file)
 })
 
-app.listen(port, () => {
-  console.log(`SERVER RUNNING ON PORT ${port}`)
-})
+app.listen(port);

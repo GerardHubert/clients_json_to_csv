@@ -11,10 +11,10 @@ main>h1 {
 
 main>form {
   width: 100%;
-  height: 100px;
+  height: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
 }
 
@@ -25,10 +25,12 @@ main>form {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  margin-bottom: 10px;
 }
 
 .error,
-.success {
+.success,
+.download_button {
   width: 800px;
   height: 30px;
   display: none;
@@ -42,12 +44,25 @@ main>form {
   background-color: #16a085;
 }
 
+.download_button {
+  background-color: white;
+  color: black;
+  margin-top: 10px;
+  border: 1px solid black;
+  text-decoration: none
+}
+
+.download_button:hover {
+  cursor: pointer;
+}
+
 .show-error,
-.show-success {
+.show-success,
+.show-download-button {
   display: flex;
 }
 
-.download_button {
+/* .download_button {
   margin: auto;
   margin-top: 5px;
   width: 800px;
@@ -58,4 +73,4 @@ main>form {
   justify-content: center;
   text-decoration: none;
   color: black;
-}
+} */

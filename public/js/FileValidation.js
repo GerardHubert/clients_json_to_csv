@@ -55,18 +55,21 @@ class FileValidation {
     const sendFile = async () => {
       const fd = new FormData();
       fd.append('file', file);
-      const response = await fetch("/submit_file", {
+      const response = await fetch("http://localhost:3000/submit_file", {
         method: "POST",
-        body: fd
+        body: fd,
+        credentials: "same-origin"
       });
       const data = await response.json();
 
       if (response.status === 200) {
         this.successElement.classList.add('show-success');
         this.successElement.innerText = "Fichier .csv créé avec succès";
+
         this.downloadButton.classList.add('show-download-button');
+        this.downloadButton.setAttribute('href', data.link);
         this.downloadButton.setAttribute('href', "ms-excel:ofe|u|file:" + data.link);
-        this.downloadButton.innerText = "Ouvrir le fichier .csv";
+        this.downloadButton.innerText = "Télécharger le fichier .csv";
 
         this.downloadButton.addEventListener('click', () => {
           this.downloadButton.classList.remove('show-download-button');

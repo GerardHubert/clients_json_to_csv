@@ -13,10 +13,10 @@ const upload = multer({ dest: 'data/uploads' });
 
 const fs = require('fs');
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
 // c'est ici qu'on reçoit le fichier soumis par l'utilisateur
@@ -56,4 +56,6 @@ app.post('/submit_file', upload.single('file'), (req, res) => {
   remove.removeFile(fs, file)
 })
 
-app.listen(port);
+app.listen(port, () => {
+  console.log('server running');
+});

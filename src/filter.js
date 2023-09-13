@@ -1,16 +1,15 @@
 function getActiveUsers(file) {
 
+  const filteredJSON = [];
   // si on ne sait pas si le user est actif, on définit false par défaut
   for (const user of file) {
-    !user.hasOwnProperty('isActive') ? user.isActive = false : null
-  }
-
-  // ensuite on filtre en ne gardant que les users actifs
-  const filteredJSON = file.filter((user) => user.isActive === true)
-
-  // on supprime la propriété isActive pour ne pas avoir à l'afficher dans le .csv
-  for (const user of filteredJSON) {
-    delete user.isActive;
+    !user.hasOwnProperty('isActive') ? user.isActive = false : null;
+    if (user.isActive === true) {
+      delete user.isActive;
+      user.name = user.name.replace(/"/g, '');
+      user.company = user.company.replace(/"/g, '');
+      filteredJSON.push(user);
+    }
   }
 
   return filteredJSON;
